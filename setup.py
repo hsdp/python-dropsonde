@@ -1,7 +1,8 @@
 import sys
+import os
 from os import path
-from dropsonde import __version__
 from setuptools import setup, find_packages
+from dropsonde import __version__
 
 dirname = path.realpath(path.dirname(__file__))
 

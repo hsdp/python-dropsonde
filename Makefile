@@ -109,5 +109,5 @@ package:
 build: clone compile test package
 
 .PHONY: deploy
-deploy:
+deploy: clean clone compile test
 	$(PY3_ACT) $(PY3_EXE) setup.py sdist upload

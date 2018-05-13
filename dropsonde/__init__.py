@@ -1,3 +1,4 @@
+import os
 import re
 import sys
 import six
@@ -19,20 +20,32 @@ def get_last_name(mod):
     return name
 
 
+def load_modules():
+    try:
+        from . import pb
+
+        _self = sys.modules[__name__]
+        full_name = '.'.join([__name__, 'pb'])
+        setattr(_self, 'pb', pb)
+        sys.modules[full_name] = pb
+        for module in list_modules(pb):
+            name = get_last_name(module)
+            setattr(_self, name, module)
+            if not hasattr(pb, name):
+                setattr(pb, name, module)
+            full_name = '.'.join([__name__, name])
+            if full_name in sys.modules:
+                raise KeyError('Module "{0}" is already set'.format(full_name))
+            sys.modules[full_name] = module
+
+    except Exception:
+        traceback.print_exc()
+        raise
+
+
 try:
-    from . import pb
-
-    _self = sys.modules[__name__]
-    for module in list_modules(pb):
-        name = get_last_name(module)
-        setattr(_self, name, module)
-        if not hasattr(pb, name):
-            setattr(pb, name, module)
-        full_name = '.'.join([__name__, name])
-        if full_name in sys.modules:
-            raise KeyError('Module "{0}" is already set'.format(full_name))
-        sys.modules[full_name] = module
-
-except Exception:
-    traceback.print_exc()
-    raise
+    import google.protobuf
+    load_modules()
+except ImportError:
+    print('dropsonde: Unable to import protobuf. Assuming installing...')
+    pass
