@@ -51,48 +51,30 @@ compile-py2: clean-compile-py2
 		clone refactor protoc
 	echo > $(PY2_OUTDIR)/__init__.py
 
-#.PHONY: compile-py3 
-#compile-py3: clean-compile-py3
-#	python3 build.py \
-#		--source-dir "$(PROTO_PATH)/events" \
-#		--namespace-path $(PY3_NSPATH) \
-#		--namespace-module $(PY3_NSMOD) \
-#		--lang $(PY3_LANG) \
-#		--output-dir $(OUTPUT_DIR) \
-#		--build-dir $(BUILD_DIR) \
-#		clone refactor protoc
-#	echo > $(PY3_OUTDIR)/__init__.py
-
 .PHONY: compile
-compile: compile-py2 #compile-py3
+compile: compile-py2
 
 .PHONY: clean-compile-py2
 clean-compile-py2:
 	[[ -d $(PY2_OUTDIR) ]] && rm -r $(PY2_OUTDIR) || :
 
-#.PHONY: clean-compile-py3
-#clean-compile-py3:
-#	[[ -d $(PY3_OUTDIR) ]] && rm -r $(PY3_OUTDIR) || :
-
 .PHONY: clean-compile
-clean-compile: clean-compile-py2 #clean-compile-py3
+clean-compile: clean-compile-py2
 
 .PHONY: install-py2
 install-py2:
 	[[ ! -d $(PY2_ENV) ]] && $(PY2_VENV) $(PY2_ENV) || :
 	$(PY2_ACT) pip install -r requirements.txt
-#	$(PY2_ACT) pip install -r requirements2.txt
 	$(PY2_ACT) pip install -r requirements-dev.txt
 
 .PHONY: install-py3
 install-py3:
 	[[ ! -d $(PY3_ENV) ]] && $(PY3_VENV) $(PY3_ENV) || :
 	$(PY3_ACT) pip install -r requirements.txt
-#	$(PY3_ACT) pip install -r requirements3.txt
 	$(PY3_ACT) pip install -r requirements-dev.txt
 
 .PHONY: install
-install: clone install-py2 #install-py3
+install: clone install-py2
 
 .PHONY: clean-env-py2
 clean-env-py2:
@@ -121,7 +103,11 @@ test: test-py2 test-py3
 
 .PHONY: package
 package:
-	$(PY2_ACT) $(PY2_EXE) setup.py sdist
+	$(PY3_ACT) $(PY3_EXE) setup.py sdist
 
 .PHONY: build
 build: clone compile test package
+
+.PHONY: deploy
+deploy:
+	$(PY3_ACT) $(PY3_EXE) setup.py sdist upload
