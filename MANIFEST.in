@@ -1,6 +1,4 @@
 include requirements.txt
-include requirements2.txt
-include requirements3.txt
 include LICENSE
 include README.md
 prune test

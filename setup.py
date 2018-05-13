@@ -1,7 +1,7 @@
 import sys
 from os import path
-from setuptools import setup, find_packages
 from dropsonde import __version__
+from setuptools import setup, find_packages
 
 dirname = path.realpath(path.dirname(__file__))
 
@@ -14,12 +14,6 @@ def load_requirements(filename):
 
 reqs = []
 reqs.extend(load_requirements('requirements.txt'))
-if sys.version_info[0] == 3:
-    reqs.extend(load_requirements('requirements3.txt'))
-else:
-    reqs.extend(load_requirements('requirements2.txt'))
-
-
 readme = path.join(dirname, 'README.md')
 
 
@@ -29,9 +23,8 @@ setup(
     description='Compiled python generated from the Cloud Foundry Dropsonde Protobuf definition files',
     author='Adam Jaso',
     license='Apache License Version 2.0',
-long_description=open(readme).read(),
+    long_description=open(readme).read(),
     packages=find_packages(),
     install_requires=reqs,
-    url='https://github.com/hsdp/python-dropsonde',
-
+    url='https://github.com/hsdp/python-dropsonde'
 )
