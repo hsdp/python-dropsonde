@@ -1,7 +1,6 @@
 import os
 import re
 import sys
-import six
 import pkgutil
 import traceback
 import importlib
