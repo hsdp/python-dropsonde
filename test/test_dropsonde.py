@@ -1,6 +1,13 @@
+import sys
 import six
+import pkgutil
 import importlib
 from unittest import TestCase
+
+
+def load_modules(package):
+    for importer, modname, ispkg in pkgutil.iter_modules(package.__path__):
+        yield importlib.import_module('.' + modname, package.__name__)
 
 
 class Dropsonde(TestCase):
@@ -8,15 +15,8 @@ class Dropsonde(TestCase):
         import dropsonde
 
     def test_import_submodules(self):
-        import dropsonde
-        from dropsonde import list_modules, get_last_name, pb
-        for module in list_modules(pb):
-            name = get_last_name(module)
-            full_name = '.'.join([dropsonde.__name__, name])
-            imported = importlib.import_module(full_name)
-            self.assertEqual(module, getattr(dropsonde, name))
-            self.assertEqual(module, getattr(pb, name))
-            self.assertEqual(module, imported)
+        from dropsonde import pb
+        for module in load_modules(pb): pass
 
     def test_import_pb(self):
         from dropsonde import pb

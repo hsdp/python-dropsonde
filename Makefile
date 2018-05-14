@@ -74,7 +74,7 @@ install-py3:
 	$(PY3_ACT) pip install -r requirements-dev.txt
 
 .PHONY: install
-install: clone install-py2
+install: clone install-py2 install-py3
 
 .PHONY: clean-env-py2
 clean-env-py2:
