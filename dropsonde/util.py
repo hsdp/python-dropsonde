@@ -1,4 +1,28 @@
-def get_uuid_string(**x):
+def parse_part(x):
+    x = int(x)
+    parts = []
+    while x > 0:
+        parts.append('%02x' % (x % 256))
+        x = x >> 8
+    return ''.join(parts)
+
+
+def unparse_part(part):
+    result = 0
+    while len(part) > 0:
+        part, x = part[:-2], part[-2:]
+        result = (result + int(x, 16)) << 8
+    return result >> 8
+
+
+def get_uuid_parts(uuid):
+    uuid = uuid.replace('-', '')
+    low = unparse_part(uuid[:16])
+    high = unparse_part(uuid[16:])
+    return dict(low=low, high=high)
+
+
+def get_uuid_string(low=None, high=None, **x):
     """This method parses a UUID protobuf message type from its component
     'high' and 'low' longs into a standard formatted UUID string
 
@@ -9,25 +33,7 @@ def get_uuid_string(**x):
     Returns:
         str: UUID formatted string
     """
-    if 'low' not in x or 'high' not in x:
+    if low is None or high is None:
         return None
-
-    # convert components to hex strings and strip off '0x'
-    low = int(x['low'])
-    high = int(x['high'])
-
-    l = hex(low)[2:-1]
-    h = hex(high)[2:-1]
-
-    # ensure we have leading 0 bytes set
-    l = ''.join(['0' * (16 - len(l)), l])
-    h = ''.join(['0' * (16 - len(h)), h])
-
-    # split/reverse/join little endian bytes
-    x = ''.join([
-        ''.join([l[i:i+2] for i in range(0, len(l), 2)][::-1]),
-        ''.join([h[i:i+2] for i in range(0, len(h), 2)][::-1]),
-    ])
-
-    # create uuid formatted string
-    return '-'.join([x[:8], x[8:12], x[12:16], x[16:20], x[20:]])
+    x = ''.join([parse_part(low), parse_part(high)])
+    return '-'.join([x[:8], x[8:12], x[12:16], x[16:20], x[20:32]])
